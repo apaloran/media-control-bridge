@@ -80,6 +80,10 @@ enum Commands {
         /// Local player name shown by MPRIS-capable desktops.
         #[arg(long, default_value = "RemoteMusic")]
         name: String,
+
+        /// Seconds between `status` requests used to show title and play state. 0 disables polling.
+        #[arg(long, default_value_t = 2)]
+        poll_interval: u64,
     },
 
     /// Windows controller endpoint: expose a local SMTC player that forwards commands over TCP.
@@ -178,8 +182,8 @@ async fn main() -> Result<()> {
             };
             server::serve(&listen, token, target).await
         }
-        Commands::MprisClient { connect, token, name } => {
-            linux_mpris_client::run_mpris_client(connect, token, name).await
+        Commands::MprisClient { connect, token, name, poll_interval } => {
+            linux_mpris_client::run_mpris_client(connect, token, name, poll_interval).await
         }
         Commands::SmtcClient { connect, token, name } => {
             windows_smtc::run_smtc_client(connect, token, name).await

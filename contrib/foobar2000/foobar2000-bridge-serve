@@ -1,0 +1,31 @@
+#!/bin/sh
+# Runs the media-control-bridge server for foobar2000 under Wine.
+# Settings come from the environment (see foobar2000.env.example).
+set -eu
+
+: "${WINEPREFIX:?set WINEPREFIX in ~/.config/media-control-bridge/foobar2000.env}"
+: "${WINE:=wine}"
+: "${FOOBAR_EXE:=$WINEPREFIX/drive_c/Program Files/foobar2000/foobar2000.exe}"
+: "${BRIDGE_LISTEN:=127.0.0.1:17777}"
+: "${BEEFWEB_URL:=}"
+export WINEPREFIX
+
+# Quote values for use inside the sh -c commands the bridge runs.
+q() { printf "'%s'" "$(printf '%s' "$1" | sed "s/'/'\\\\''/g")"; }
+fb="$(q "$WINE") $(q "$FOOBAR_EXE")"
+
+set -- serve --listen "$BRIDGE_LISTEN" --target cmd \
+  --cmd-play-pause "$fb /playpause" \
+  --cmd-play "$fb /play" \
+  --cmd-pause "$fb /pause" \
+  --cmd-stop "$fb /stop" \
+  --cmd-next "$fb /next" \
+  --cmd-previous "$fb /prev"
+
+if [ -n "$BEEFWEB_URL" ]; then
+  # foo_beefweb returns playbackState and the requested title-format columns.
+  status="curl -fsS --max-time 2 $(q "$BEEFWEB_URL/api/player?columns=%25title%25,%25artist%25,%25album%25") | jq -c '.player as \$p | {playback: \$p.playbackState, title: \$p.activeItem.columns[0], artist: \$p.activeItem.columns[1], album: \$p.activeItem.columns[2]}'"
+  set -- "$@" --cmd-status "$status"
+fi
+
+exec media-control-bridge "$@"

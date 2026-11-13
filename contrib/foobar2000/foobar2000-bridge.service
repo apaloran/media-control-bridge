@@ -1,0 +1,14 @@
+[Unit]
+Description=media-control-bridge server for foobar2000 (Wine)
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+EnvironmentFile=%h/.config/media-control-bridge/foobar2000.env
+Environment=PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=%h/.local/bin/foobar2000-bridge-serve
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=graphical-session.target
