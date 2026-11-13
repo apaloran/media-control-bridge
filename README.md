@@ -100,6 +100,10 @@ media-control-bridge mpris-client \
 
 Then KDE's media widget, GNOME shell, or `playerctl -p WineCloudMusic play-pause` will send commands to the controlled endpoint.
 
+`mpris-client` also asks the server for `status` every 2 seconds (`--poll-interval`, `0` turns it off) and shows the title, artist, album and play state on the desktop. A `cmd` target's `--cmd-status` command can print either a plain state (`playing`, `paused` or `stopped`) or a JSON object such as `{"playback":"playing","title":"…","artist":"…","album":"…"}`.
+
+For a ready-made setup that controls foobar2000 under Wine from KDE and starts at login, see [`contrib/foobar2000`](contrib/foobar2000/README.md).
+
 ### Windows controller endpoint: expose remote as Windows SMTC player
 
 ```powershell

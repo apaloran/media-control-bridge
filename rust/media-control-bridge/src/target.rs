@@ -71,6 +71,14 @@ async fn handle_cmd(map: &CommandMap, command: MediaCommand) -> Result<Option<Pl
 
     let output = run_shell(script).await?;
     if matches!(command, MediaCommand::Status) {
+        // A status command may print a JSON PlaybackState
+        // ({"playback":..,"title":..,"artist":..,"album":..}); otherwise its
+        // output is taken as the playback state string.
+        if output.starts_with('{') {
+            let state: PlaybackState = serde_json::from_str(&output)
+                .with_context(|| format!("status command printed invalid JSON: {output}"))?;
+            return Ok(Some(state));
+        }
         Ok(Some(PlaybackState {
             playback: if output.is_empty() { None } else { Some(output) },
             ..Default::default()
