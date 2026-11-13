@@ -1,23 +1,10 @@
-Prebuilt binary status
-======================
+Build status
+============
 
-This ChatGPT sandbox does not have rustc/cargo installed, so I could not compile native Rust binaries inside the sandbox.
+Verified 2026-11-13 with rustc 1.97.0:
 
-Included instead:
+- Linux x86_64: `cargo build --release` succeeds (2 harmless dead-code/unused-import warnings from cfg-gated Windows stubs).
+- Windows x86_64: `cargo check --target x86_64-pc-windows-gnu` succeeds (2 harmless dead-code warnings from cfg-gated Linux helpers).
+- Smoke test: `serve --target cmd` answers status/next commands with ok acks and rejects a wrong token with "unauthorized".
 
-- Full Rust source code.
-- Full Python prototype source code.
-- Linux x86_64 and Windows x86_64 build scripts.
-- GitHub Actions workflow that builds x86_64 Linux and Windows binaries automatically.
-
-To produce the binaries:
-
-Linux x86_64:
-  cd rust/media-control-bridge
-  cargo build --release
-
-Windows x86_64:
-  cd rust\media-control-bridge
-  cargo build --release --target x86_64-pc-windows-msvc
-
-The requested architecture is x86_64 only; all build scripts target x86_64.
+Prebuilt binaries are not committed; build them with the scripts in scripts/ or the GitHub Actions workflow.
